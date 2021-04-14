@@ -7,16 +7,13 @@ class TransactionList extends StatelessWidget {
   final List<Transaction> transaction;
   final Function deleteTx;
 
-  TransactionList(this.transaction,this.deleteTx);
+  TransactionList(this.transaction, this.deleteTx);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 400.0,
-      //height: MediaQuery.of(context).size.height - 100,
-      //height: double.infinity - 50,
-      child: transaction.isEmpty
-          ? Column(
+    return transaction.isEmpty
+        ? LayoutBuilder(builder: (context, constraints) {
+            return Column(
               children: [
                 Text(
                   "No Transaction added yet!",
@@ -27,48 +24,55 @@ class TransactionList extends StatelessWidget {
                   height: 20.0,
                 ),
                 Container(
-                  height: 200.0,
+                  height: constraints.maxHeight * 0.60,
                   child: Image.asset(
                     'assets/images/waiting.png',
                     fit: BoxFit.cover,
                   ),
                 ),
               ],
-            )
-          : ListView.builder(
-              itemCount: transaction.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 5.0,
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6.0),
-                        child: FittedBox(
-                          child: Text('\৳${transaction[index].amount}'),
-                        ),
+            );
+          })
+        : ListView.builder(
+            itemCount: transaction.length,
+            itemBuilder: (context, index) {
+              return Card(
+                elevation: 5.0,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: EdgeInsets.all(6.0),
+                      child: FittedBox(
+                        child: Text('\৳${transaction[index].amount}'),
                       ),
                     ),
-                    title: Text(
-                      transaction[index].title,
-                      // ignore: deprecated_member_use
-                      style: Theme.of(context).textTheme.title,
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMd().format(transaction[index].date),
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () => deleteTx(transaction[index].id),
-                    ),
                   ),
-                );
-              },
-            ),
-    );
+                  title: Text(
+                    transaction[index].title,
+                    // ignore: deprecated_member_use
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  subtitle: Text(
+                    DateFormat.yMMMd().format(transaction[index].date),
+                  ),
+                  trailing: MediaQuery.of(context).size.width > 360
+                      ? FlatButton.icon(
+                          icon: Icon(Icons.delete),
+                          textColor: Theme.of(context).errorColor,
+                          onPressed: () => deleteTx(transaction[index].id),
+                          label: Text('Delete'),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: Theme.of(context).errorColor,
+                          onPressed: () => deleteTx(transaction[index].id),
+                        ),
+                ),
+              );
+            },
+          );
   }
 }
 
